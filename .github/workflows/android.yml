@@ -39,11 +39,14 @@ jobs:
 
       - name: Verify APK signatures
         run: |
+          set -e
           SDK="${ANDROID_HOME:-$ANDROID_SDK_ROOT}"
-          APKSIGNER=$(find "$SDK/build-tools" -name apksigner | sort | tail -1)
-          "$APKSIGNER" verify --print-certs app/build/outputs/apk/debug/app-debug.apk
-          "$APKSIGNER" verify --print-certs app/build/outputs/apk/release/app-release.apk
-          "$SDK/build-tools/"*/zipalign -c -v -p 4 app/build/outputs/apk/debug/app-debug.apk | tail -3
+          BT=$(find "$SDK/build-tools" -maxdepth 1 -type d | sort | tail -1)
+          APKSIGNER="$BT/apksigner"
+          ZALIGN="$BT/zipalign"
+          "$APKSIGNER" verify --v1-signing-enabled --print-certs app/build/outputs/apk/debug/app-debug.apk
+          "$APKSIGNER" verify --v1-signing-enabled --print-certs app/build/outputs/apk/release/app-release.apk
+          "$ZALIGN" -c -p 4 app/build/outputs/apk/release/app-release.apk
 
       - name: Upload APKs
         uses: actions/upload-artifact@v4
