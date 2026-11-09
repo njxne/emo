@@ -35,12 +35,16 @@ push 到 main 自动触发，JDK 21 + ubuntu x86_64）。改完代码本地只�
   - `MainActivity.kt` — 入口，`enableEdgeToEdge`
   - `NotesApp.kt` — 顶层：壁纸渐变 + `rememberLayerBackdrop` + 三个 tab + 编辑器
   - `data/NoteStore.kt` — 笔记仓库，JSON 文件持久化（`filesDir/notes.json`），StateFlow
-  - `ui/components/LiquidBottomBar.kt` — 液态玻璃底栏（基于 backdrop 库，胶囊形 +
-    vibrancy/blur/lens + 滑动指示器）
+  - `ui/components/liquid/` — **从 AndroidLiquidGlass catalog 原样搬来的官方液玻璃底栏**：
+    `LiquidBottomTabs.kt`（容器）+ `LiquidBottomTab.kt`（单 tab）+ 其配套工具
+    `DampedDragAnimation` / `InteractiveHighlight` / `DragGestureInspector` / `awaitFrame`
   - `ui/screens/` — 笔记列表 / 收藏 / 设置 / 编辑器
   - `ui/theme/Icons.kt` — 手写的 Material 风格矢量图标（`ImageVector.Builder`）
-- 底栏是核心：改 `LiquidBottomBar` 时注意它依赖 backdrop 的 `drawBackdrop` + `Capsule`
-  形状，滑动指示器用 `Animatable` + `offset`。
+- 底栏是核心，直接使用官方组件（别再手写仿品）：`NotesApp` 用 `LiquidBottomTabs`
+  声明容器，向 `content`（RowScope）里放 `LiquidBottomTab(onClick) { 图标 + 文字 }`。
+  官方实现含按压挤扁、横向拖动切 tab、镜头畸变 lens、随动光斑高光、内外阴影。
+  工具文件里把 `kotlin.time.Clock` 换成了 `System.currentTimeMillis()`，把 KMP 的
+  `expect fun awaitFrame()` 换成了 `withFrameNanos` 实现——因为本模块是纯 Android。
 
 ## Git
 

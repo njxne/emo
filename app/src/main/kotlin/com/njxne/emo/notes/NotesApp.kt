@@ -1,33 +1,40 @@
 package com.njxne.emo.notes
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.kyant.backdrop.backdrops.layerBackdrop
 import com.kyant.backdrop.backdrops.rememberLayerBackdrop
 import com.njxne.emo.notes.data.NoteStore
-import com.njxne.emo.notes.ui.components.BottomTabItem
-import com.njxne.emo.notes.ui.components.LiquidBottomBar
+import com.njxne.emo.notes.ui.components.liquid.LiquidBottomTab
+import com.njxne.emo.notes.ui.components.liquid.LiquidBottomTabs
 import com.njxne.emo.notes.ui.screens.EditorScreen
 import com.njxne.emo.notes.ui.screens.FavoritesScreen
 import com.njxne.emo.notes.ui.screens.NotesScreen
@@ -129,16 +136,32 @@ fun NotesApp() {
                     .navigationBarsPadding()
                     .padding(horizontal = 8.dp)
             ) {
-                LiquidBottomBar(
-                    items = listOf(
-                        BottomTabItem(Icons.Notes, "笔记"),
-                        BottomTabItem(Icons.Star, "收藏"),
-                        BottomTabItem(Icons.Settings, "设置"),
-                    ),
+                LiquidBottomTabs(
                     selectedTabIndex = { tabIndex },
                     onTabSelected = { tabIndex = it },
-                    backdrop = backdrop
-                )
+                    backdrop = backdrop,
+                    tabsCount = 3,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    LiquidBottomTab(onClick = { tabIndex = 0 }) {
+                        Image(Icons.Notes, null, Modifier.size(28.dp),
+                            colorFilter = ColorFilter.tint(if (isDark) Color.White else Color.Black))
+                        BasicText("笔记", style = TextStyle(
+                            fontSize = 12.sp, color = if (isDark) Color.White else Color.Black))
+                    }
+                    LiquidBottomTab(onClick = { tabIndex = 1 }) {
+                        Image(Icons.Star, null, Modifier.size(28.dp),
+                            colorFilter = ColorFilter.tint(if (isDark) Color.White else Color.Black))
+                        BasicText("收藏", style = TextStyle(
+                            fontSize = 12.sp, color = if (isDark) Color.White else Color.Black))
+                    }
+                    LiquidBottomTab(onClick = { tabIndex = 2 }) {
+                        Image(Icons.Settings, null, Modifier.size(28.dp),
+                            colorFilter = ColorFilter.tint(if (isDark) Color.White else Color.Black))
+                        BasicText("设置", style = TextStyle(
+                            fontSize = 12.sp, color = if (isDark) Color.White else Color.Black))
+                    }
+                }
             }
         }
 
