@@ -14,6 +14,7 @@ compose-foundation = { group = "androidx.compose.foundation", name = "foundation
 compose-ui = { group = "androidx.compose.ui", name = "ui", version.ref = "compose" }
 compose-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics", version.ref = "compose" }
 kyant-shapes = { group = "io.github.kyant0", name = "shapes", version.ref = "kyantShapes" }
+kyant-backdrop = { group = "io.github.kyant0", name = "backdrop", version = "2.0.1" }
 jetbrains-annotations = { group = "org.jetbrains", name = "annotations", version.ref = "annotations" }
 
 [plugins]

@@ -20,5 +20,4 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "EmoNotes"
-include(":backdrop")
 include(":app")
