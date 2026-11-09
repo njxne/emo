@@ -45,4 +45,5 @@ dependencies {
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.graphics)
     implementation(libs.kyant.backdrop)
+    implementation(libs.kyant.shapes)
 }
