@@ -153,7 +153,7 @@ private fun LiquidTab(
     )
     val color by animateColorAsState(
         targetValue = if (selected) accent else contentColor,
-        animationSpec = spring(0.5f, 300f, 0.01f),
+        animationSpec = spring<Color>(dampingRatio = 0.5f, stiffness = 300f),
         label = "tabColor"
     )
     Column(

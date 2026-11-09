@@ -1,5 +1,6 @@
 package com.njxne.emo.notes
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,7 +19,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
@@ -57,6 +57,7 @@ fun NotesApp() {
             runCatching {
                 ThemeMode.valueOf(
                     prefs.getString(ThemePrefs.KEY_THEME, ThemeMode.SYSTEM.name)
+                        ?: ThemeMode.SYSTEM.name
                 )
             }.getOrDefault(ThemeMode.SYSTEM)
         )
@@ -78,14 +79,15 @@ fun NotesApp() {
 
     val view = LocalView.current
     SideEffect {
-        WindowInsetsControllerCompat(view.window, view).isAppearanceLightStatusBars = !isDark
+        val window = (view.context as? android.app.Activity)?.window ?: return@SideEffect
+        WindowInsetsControllerCompat(window, view).isAppearanceLightStatusBars = !isDark
     }
 
     Box(Modifier.fillMaxSize()) {
         Box(
             Modifier
                 .fillMaxSize()
-                .paint(if (isDark) DarkWallpaper else LightWallpaper)
+                .background(if (isDark) DarkWallpaper else LightWallpaper)
                 .layerBackdrop(backdrop)
         )
 
