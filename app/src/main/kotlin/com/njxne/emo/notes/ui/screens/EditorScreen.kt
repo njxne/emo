@@ -84,9 +84,9 @@ fun EditorScreen(
                 style = TextStyle(
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold,
-                    color = titleColor
-                ),
-                textAlign = TextAlign.Center
+                    color = titleColor,
+                    textAlign = TextAlign.Center
+                )
             )
             Box(
                 Modifier
@@ -114,7 +114,7 @@ fun EditorScreen(
         Box(
             Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, top = 8.dp)
+                .padding(start = 16.dp, end = 16.dp, top = 8.dp)
                 .clip(RoundedCornerShape(16.dp))
                 .drawBackdrop(
                     backdrop = backdrop,
@@ -143,7 +143,7 @@ fun EditorScreen(
             Modifier
                 .weight(1f)
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, top = 8.dp)
+                .padding(start = 16.dp, end = 16.dp, top = 8.dp)
                 .clip(RoundedCornerShape(16.dp))
                 .drawBackdrop(
                     backdrop = backdrop,
@@ -171,7 +171,7 @@ fun EditorScreen(
         Box(
             Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, bottom = 24.dp)
+                .padding(start = 16.dp, end = 16.dp, bottom = 24.dp)
                 .padding(bottom = 16.dp)
         ) {
             if (noteId != null) {

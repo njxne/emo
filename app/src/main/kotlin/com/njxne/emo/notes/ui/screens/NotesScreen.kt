@@ -19,7 +19,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.CircleShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.unit.dp
@@ -33,7 +33,7 @@ import com.njxne.emo.notes.data.Note
 import com.njxne.emo.notes.data.NoteStore
 import com.njxne.emo.notes.ui.theme.Icons
 import com.njxne.emo.notes.ui.theme.StarGold
-import kotlinx.coroutines.flow.collectAsState
+import androidx.compose.runtime.collectAsState
 
 @Composable
 fun NotesScreen(
@@ -159,7 +159,7 @@ private fun NotesList(
             Modifier
                 .align(Alignment.BottomEnd)
                 .size(56.dp)
-                .padding(horizontal = 16.dp, bottom = 20.dp)
+                .padding(start = 16.dp, end = 16.dp, bottom = 20.dp)
                 .drawBackdrop(
                     backdrop = backdrop,
                     shape = { CircleShape },

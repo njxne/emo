@@ -32,7 +32,7 @@ import com.njxne.emo.notes.data.NoteStore
 import com.njxne.emo.notes.ui.theme.AccentDark
 import com.njxne.emo.notes.ui.theme.AccentLight
 import com.njxne.emo.notes.ui.theme.ThemeMode
-import kotlinx.coroutines.flow.collectAsState
+import androidx.compose.runtime.collectAsState
 
 @Composable
 fun SettingsScreen(
@@ -65,7 +65,7 @@ fun SettingsScreen(
 
         BasicText(
             "主题",
-            Modifier.padding(horizontal = 20.dp, top = 16.dp),
+            Modifier.padding(start = 20.dp, end = 20.dp, top = 16.dp),
             style = androidx.compose.ui.text.TextStyle(
                 fontSize = 14.sp,
                 fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold,
@@ -75,7 +75,7 @@ fun SettingsScreen(
         Row(
             Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp, top = 8.dp),
+                .padding(start = 20.dp, end = 20.dp, top = 8.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             ThemeOption(
@@ -103,7 +103,7 @@ fun SettingsScreen(
 
         BasicText(
             "数据",
-            Modifier.padding(horizontal = 20.dp, top = 24.dp),
+            Modifier.padding(start = 20.dp, end = 20.dp, top = 24.dp),
             style = androidx.compose.ui.text.TextStyle(
                 fontSize = 14.sp,
                 fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold,
@@ -134,7 +134,7 @@ fun SettingsScreen(
             Row(
                 Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp, top = 8.dp),
+                    .padding(start = 20.dp, end = 20.dp, top = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 ThemeOption(

@@ -14,9 +14,9 @@ import java.util.UUID
 object NoteStore {
 
     private lateinit var file: File
-    private val notes = MutableStateFlow<List<Note>>(emptyList())
+    private val _notes = MutableStateFlow<List<Note>>(emptyList())
 
-    val notes: StateFlow<List<Note>> = notes
+    val notes: StateFlow<List<Note>> = _notes
 
     fun init(context: Context) {
         if (::file.isInitialized) return
@@ -28,7 +28,7 @@ object NoteStore {
         if (!file.exists()) return
         runCatching {
             val array = JSONArray(file.readText())
-            notes.value = List(array.length()) { i ->
+            _notes.value = List(array.length()) { i ->
                 val o = array.getJSONObject(i)
                 Note(
                     id = o.getString("id"),
@@ -45,7 +45,7 @@ object NoteStore {
     private fun persist() {
         runCatching {
             val array = JSONArray()
-            notes.value.forEach { n ->
+            _notes.value.forEach { n ->
                 array.put(
                     JSONObject().apply {
                         put("id", n.id)
@@ -64,12 +64,12 @@ object NoteStore {
     fun create(title: String, content: String) {
         val now = System.currentTimeMillis()
         val note = Note(UUID.randomUUID().toString(), title.trim(), content, false, now, now)
-        notes.value = notes.value + note
+        _notes.value = _notes.value + note
         persist()
     }
 
     fun update(id: String, title: String, content: String) {
-        notes.value = notes.value.map {
+        _notes.value = _notes.value.map {
             if (it.id == id) it.copy(
                 title = title.trim(),
                 content = content,
@@ -80,19 +80,19 @@ object NoteStore {
     }
 
     fun setFavorite(id: String, favorite: Boolean) {
-        notes.value = notes.value.map {
+        _notes.value = _notes.value.map {
             if (it.id == id) it.copy(favorite = favorite) else it
         }
         persist()
     }
 
     fun delete(id: String) {
-        notes.value = notes.value.filterNot { it.id == id }
+        _notes.value = _notes.value.filterNot { it.id == id }
         persist()
     }
 
     fun clearAll() {
-        notes.value = emptyList()
+        _notes.value = emptyList()
         persist()
     }
 
