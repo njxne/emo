@@ -1,43 +1,48 @@
 # AGENTS.md
 
-工作区现在**只有一个项目**：`photo-answer-android/`（拍照答题 App）。
-曾有的 `npk-android/`、`rom/`、`《重装上阵》解包工具。/`、`ai-homework/` 都已被删除 ——
-旧文档里提到它们的部分一律作废，别照着去找。
+工作区现在只有一个项目：`app/`（Emo 笔记 App，底部液态玻璃导航栏）+ `backdrop/`（从
+Kyant0/AndroidLiquidGlass vendored 进来的液态玻璃效果库）。旧的 `photo-answer-android/`
+已删除，相关文档作废。
 
 ## 构建
 
 ```bash
-cd photo-answer-android && bash build.sh          # = assembleRelease，全量约 3 分钟
+./gradlew :app:assembleDebug        # debug APK
+./gradlew :app:assembleRelease      # release APK（未签名）
 ```
-产物 `app/build/outputs/apk/release/app-release.apk`，已用 `photoanswer.keystore` 签 v2+v3。
-发新版**必须升 `versionCode`**（当前 4 / versionName 1.3）。
 
-- **aarch64 坑（最容易踩）**：AGP 自带的 aapt2 是 x86_64，本机跑不了。
-  只有 `/root/android/sdk/build-tools/35.0.0/aapt2` 是 aarch64 版。
-  该 override 已写进 `/root/.gradle/gradle.properties`，`build.sh` 也传了一次 —— 别删。
-- Gradle 8.7 wrapper（`gradlew`）。缓存里有 8.14 / 9.4.1，**别用 9.x**，AGP 8.5.1 不兼容。
-- recyclerview **必须 1.3.2**（1.1.0 没有 `getBindingAdapterPosition`，编译直接失败）。
-- 没设备、没 ADB：**任何功能都无法真机验证**，只能静态核对（编译 + `apksigner verify` + `aapt2 dump badging` + 查 dex 类名）。
+产物在 `app/build/outputs/apk/`。**本机是 aarch64 Termux，AGP 自带的 aapt2 是 x86_64，
+跑不了**——所以本地通常编译不通过，构建走 GitHub Actions（`.github/workflows/android.yml`，
+push 到 main 自动触发，JDK 21 + ubuntu x86_64）。改完代码本地只能静态检查，靠 CI 验证。
 
-## 改代码前必知的三条契约
+## 版本契约（别随便改）
 
-1. **答案格式**：提示词要求模型每题前单独写一行 `#第N题`，客户端靠 `Answers.split()` 切题显示。
-   改 `Prompt.solve()` 时这个标记不能丢，正则要同步改 `Answers.MARK`。
-2. **图片清晰度**：上传长边 **2048**、质量从 95 起自适应降级，别压回 1280/q82 ——
-   作业本的字很小，低质量 JPEG 会把文字边缘糊掉、模型认不出（用户实测反馈过）。
-   参数在 `ImageUtil.UPLOAD_MAX_SIDE` / `QUALITY_STEPS`。
-3. **动画用 Material 官方 motion**（`MaterialSharedAxis` / `MaterialFadeThrough`），不要手写补间。
+- AGP 9.3.2 / Kotlin 2.4.10 / Compose 1.12.0 / shapes 1.2.1，见 `gradle/libs.versions.toml`。
+  Compose 1.12 是 KMP 发布，Android 类在 `-android` 变体里，Gradle 会自动解析，别手写坐标。
+- **AGP 9.0 起内置 Kotlin 支持，不要再加 `org.jetbrains.kotlin.android` 插件**（Kotlin 插件会直接报错
+  并提示移除）。两个模块只保留 `com.android.*` + `org.jetbrains.kotlin.plugin.compose`。
+  `kotlin { compilerOptions { jvmTarget } }` 仍可用于指定 jvmTarget（app=17，backdrop=11）。
+- `minSdk = 28`（Android 9+）。backdrop 库 minSdk 21，但它的 RuntimeShader/RenderEffect
+  在 API 31/33 以下自动降级，别在库外面假设这些能力一定可用。
+- **backdrop 库已从 KMP 转成纯 Android library**：commonMain+androidMain 合并进
+  `src/main/kotlin`，expect/actual 全部去掉（Kotlin 2.4 纯模块不支持 expect/actual，
+  会报 `'expect' and 'actual' declarations can be used only in multiplatform projects`）。
+  android 实现文件加了 `.actual.kt`/`.android.kt` 后缀避免和 expect 版同名冲突。
+
+## 代码结构
+
+- `app/src/main/kotlin/com/njxne/emo/notes/`
+  - `MainActivity.kt` — 入口，`enableEdgeToEdge`
+  - `NotesApp.kt` — 顶层：壁纸渐变 + `rememberLayerBackdrop` + 三个 tab + 编辑器
+  - `data/NoteStore.kt` — 笔记仓库，JSON 文件持久化（`filesDir/notes.json`），StateFlow
+  - `ui/components/LiquidBottomBar.kt` — 液态玻璃底栏（基于 backdrop 库，胶囊形 +
+    vibrancy/blur/lens + 滑动指示器）
+  - `ui/screens/` — 笔记列表 / 收藏 / 设置 / 编辑器
+  - `ui/theme/Icons.kt` — 手写的 Material 风格矢量图标（`ImageVector.Builder`）
+- 底栏是核心：改 `LiquidBottomBar` 时注意它依赖 backdrop 的 `drawBackdrop` + `Capsule`
+  形状，滑动指示器用 `Animatable` + `offset`。
 
 ## Git
 
-- 分支 `main`，现有 2 个 commit。**提交前先确认**：当前跟踪了 617 个文件，
-  但其中 530 个是 `app/build/` 产物、26 个是 `.gradle/` 缓存，源码只有 52 个。
-  `.gitignore` 现在只有 `/.aicode/` 和 `/.gitignore` 两行，**没有排除 build 产物**。
-  新增提交前应先补 `app/build/`、`.gradle/`、`*.apk`，别再往里塞二进制。
-- 未经主人确认**不要代跑 `git add` / `commit` / `push` / `reset`**。
-
-## 其他
-
-- `python3` 没有 pip，装不了第三方包。
-- Bash 工具跑的是 dash，**不支持 `{}` 花括号展开**，写脚本用 POSIX 写法。
-- 项目专属约定与踩坑记在 `~/.aicode/memory/photo-answer-android.md`，开工前值得读一眼。
+- 分支 `main`。提交前确认 `.gitignore` 排除了 `build/`、`.gradle/`、`*.apk`、`local.properties`。
+- 未经主人确认不要代跑 `git add` / `commit` / `push` / `reset`。
