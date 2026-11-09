@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -37,9 +37,28 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
       - run: ./gradlew assembleDebug assembleRelease
 
+      - name: Verify APK signatures
+        run: |
+          SDK="${ANDROID_HOME:-$ANDROID_SDK_ROOT}"
+          APKSIGNER=$(find "$SDK/build-tools" -name apksigner | sort | tail -1)
+          "$APKSIGNER" verify --print-certs app/build/outputs/apk/debug/app-debug.apk
+          "$APKSIGNER" verify --print-certs app/build/outputs/apk/release/app-release.apk
+          "$SDK/build-tools/"*/zipalign -c -v -p 4 app/build/outputs/apk/debug/app-debug.apk | tail -3
+
       - name: Upload APKs
         uses: actions/upload-artifact@v4
         with:
           name: apk
           path: app/build/outputs/apk/
           if-no-files-found: error
+
+      - name: Publish release APK
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.${{ github.run_number }}
+          name: emo v1.0.${{ github.run_number }}
+          files: |
+            app/build/outputs/apk/debug/app-debug.apk
+            app/build/outputs/apk/release/app-release.apk
+          fail_on_unmatched_files: true
